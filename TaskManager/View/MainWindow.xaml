@@ -64,7 +64,7 @@
                     <DataTemplate>
                         <ctrls:IssueUserControl
                             CloseCommand="{Binding Path=DataContext.CloseIssueCommand, RelativeSource={RelativeSource AncestorType={x:Type DockPanel}}}"
-                            CloseParameterCommand="{Binding}"
+                            CloseCommandParameter="{Binding}"
                             IssueName="{Binding IssueItem.Subject}"
                             StartTimerCommand="{Binding DataContext.StartCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DockPanel}}}"
                             IsActive="{Binding IsActive, Mode=TwoWay}"                           

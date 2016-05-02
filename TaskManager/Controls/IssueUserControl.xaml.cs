@@ -28,10 +28,10 @@ namespace TaskManager.Controls
         }
 
         public static readonly DependencyProperty CloseCommandProperty =
-        DependencyProperty.Register(
-             "CloseCommand",
-             typeof(ICommand),
-             typeof(IssueUserControl));
+      DependencyProperty.Register(
+           "CloseCommand",
+           typeof(ICommand),
+           typeof(IssueUserControl));
 
         public ICommand CloseCommand
         {
@@ -47,11 +47,11 @@ namespace TaskManager.Controls
 
         public static readonly DependencyProperty CloseCommandParameterProperty =
         DependencyProperty.Register(
-             "CloseParameterCommand",
+             "CloseCommandParameter",
              typeof(object),
              typeof(IssueUserControl));
 
-        public object CloseParameterCommand
+        public object CloseCommandParameter
         {
             get
             {

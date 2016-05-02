@@ -186,7 +186,14 @@ namespace TaskManager.Model
 
         public void DeleteItem(TrackedIssue issue)
         {
-            Items.Remove(issue);
+            bool itWasActive = ActiveIssue == issue;
+                Items.Remove(issue);
+            if (itWasActive && Items.Count > 0)
+            {
+                var firstIss = Items[0];
+                if (firstIss != null)
+                    firstIss.IsActive = true;
+            }
         }
         private void ActiveIssueChanged(object sender, EventArgs args)
         {
