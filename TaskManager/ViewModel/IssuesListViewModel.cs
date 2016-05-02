@@ -70,9 +70,7 @@ namespace TaskManager.ViewModel
         public void Clear()
         {
             // чистим подписки
-            SendTrackedIssues = null;
-            // подгружаем задачи
-            LoadMore();
+            SendTrackedIssues = null;         
             // чистим выбранные
             SelectedIssues.Clear();
         }

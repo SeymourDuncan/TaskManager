@@ -31,25 +31,36 @@ namespace TaskManager.Controls
         DependencyProperty.Register(
              "CloseCommand",
              typeof(ICommand),
-             typeof(IssueUserControl),
-             new UIPropertyMetadata(null));
+             typeof(IssueUserControl));
+
         public ICommand CloseCommand
         {
-            get { return (ICommand)GetValue(CloseCommandProperty); }
-            set { SetValue(CloseCommandProperty, value); }
+            get
+            {
+                return (ICommand)GetValue(CloseCommandProperty);
+            }
+            set
+            {
+                SetValue(CloseCommandProperty, value);
+            }
         }
 
         public static readonly DependencyProperty CloseCommandParameterProperty =
         DependencyProperty.Register(
              "CloseParameterCommand",
              typeof(object),
-             typeof(IssueUserControl),
-             new PropertyMetadata(null));
+             typeof(IssueUserControl));
 
         public object CloseParameterCommand
         {
-            get { return GetValue(CloseCommandParameterProperty); }
-            set { SetValue(CloseCommandParameterProperty, value); }
+            get
+            {
+                return (object)GetValue(CloseCommandParameterProperty);
+            }
+            set
+            {
+                SetValue(CloseCommandParameterProperty, value);
+            }
         }
 
         public static readonly DependencyProperty IsActivePropery = DependencyProperty.Register("IsActive", typeof(bool), typeof(IssueUserControl), new PropertyMetadata(false));
