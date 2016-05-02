@@ -1,0 +1,62 @@
+﻿<Window x:Class="TaskManager.View.IssuesList"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TaskManager.View"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Title="Add issues to track" Height="300" Width="559.5"
+        DataContext="{Binding IssuesListViewModel, Source={StaticResource Locator}}" ResizeMode="NoResize">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadedCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <xctk:BusyIndicator IsBusy="{Binding MainBusy}" BusyContent="Authorization..." Grid.Row="1">
+            <ListBox x:Name="listBox" Margin="5" Grid.Row="1" ItemsSource="{Binding Issues}" Height="208" ScrollViewer.HorizontalScrollBarVisibility="Hidden" Padding="5,0,0,0">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Focusable" Value="false"/>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox Margin="0,0,0,4">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Checked">
+                                    <i:InvokeCommandAction Command="{Binding DataContext.AddCheckedIssueCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}" CommandParameter="{Binding}"/>
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="Unchecked">
+                                    <i:InvokeCommandAction Command="{Binding DataContext.DeleteUncheckedIssueCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}" CommandParameter="{Binding}"/>
+                                </i:EventTrigger>
+                            
+                            </i:Interaction.Triggers>
+                        
+                            <StackPanel Orientation="Horizontal" Background="#FFD9EDF3" Margin="0" Width="475">
+                                    <TextBlock Text="{Binding Id}" Margin="0,0,8,0"/>
+                                    <TextBlock Text="{Binding Subject}"/>
+                                </StackPanel>
+                            </CheckBox>
+                    
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+
+            </ListBox>
+        </xctk:BusyIndicator>    
+        <TextBox x:Name="textBox" Grid.Row="0" HorizontalAlignment="Left" Height="23" Margin="5,5,0,5" TextWrapping="Wrap" Text="Filters will be here" VerticalAlignment="Top" Width="120"/>
+        <Button Grid.Row="0" x:Name="button" Content="Track selected" Margin="0,5,25,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="122" Command="{Binding TrackSelectedCommand}"/>
+        <Button Grid.Row="0" x:Name="button1" Content="Load more" Margin="0,5,166.8,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="75" Command="{Binding LoadMoreCommand}"/>
+
+    </Grid>
+</Window>
+
+
+
