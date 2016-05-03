@@ -228,8 +228,8 @@ namespace TaskManager.ViewModel
         {            
             // пробуем сходу законнектиться
             MainBusy = true;
-            var connTask = Task.Factory.StartNew(() =>
-            {
+           Task.Factory.StartNew(() =>
+           {
                 IsConnected = program.Connect(Properties.Settings.Default.Login, Properties.Settings.Default.Password);
             }).ContinueWith((task) =>
             {

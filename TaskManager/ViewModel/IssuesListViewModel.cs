@@ -146,7 +146,9 @@ namespace TaskManager.ViewModel
                 return issues;
             }).ContinueWith((task) =>
             {
-                var issues = task.Result;            
+                var issues = task.Result;
+                if (issues == null)
+                    return;            
                 if (Issues == null)
                     Issues = issues.ToObservableCollection();
                 else
