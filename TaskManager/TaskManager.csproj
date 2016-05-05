@@ -70,8 +70,8 @@
     <Reference Include="Microsoft.Practices.ServiceLocation">
       <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
     </Reference>
-    <Reference Include="Redmine.Net.Api, Version=0.1.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\redmine-net-api.0.10\lib\net\Redmine.Net.Api.dll</HintPath>
+    <Reference Include="redmine-net451-api-signed, Version=1.0.2.0, Culture=neutral, PublicKeyToken=d31653dca0020f25, processorArchitecture=MSIL">
+      <HintPath>..\packages\redmine-api-signed.1.0.2\lib\net451\redmine-net451-api-signed.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
