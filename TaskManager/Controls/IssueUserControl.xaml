@@ -76,24 +76,9 @@
                 <ColumnDefinition/>
                 
             </Grid.ColumnDefinitions>
-            <!--<ContentControl x:Name="ActiveStateConentControl">
-                <ContentControl.Style>
-                    <Style TargetType="ContentControl">
-                        <Setter Property="ContentTemplate" Value="{StaticResource NotActiveTemp}" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Path=IsActive}" Value="False">
-                                <Setter Property="ContentTemplate" Value="{StaticResource NotActiveTemp}" />
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding Path=IsActive}" Value="True">
-                                <Setter Property="ContentTemplate" Value="{StaticResource ActiveTemp}" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </ContentControl.Style>
-            </ContentControl>-->
             <Button Margin="7" Height="20" Content="Track this" Click="Button_Click" Visibility="{Binding Path=IsActive, Converter={StaticResource InvertBoolToVisibilityConverter}}"/>
             <StackPanel Orientation="Horizontal" Margin="7" Visibility="{Binding Path=IsActive, Converter={StaticResource BoolToVisibilityConverter}}">
-                <Button BorderThickness="0" Background="Transparent" Width="20" Height="20" Margin="0,0,4,0" Command="{Binding StartTimerCommand}"  VerticalContentAlignment="Stretch" HorizontalAlignment="Left" Padding="0">
+                <Button BorderThickness="0" Background="Transparent" Width="20" Height="20" Margin="0,0,4,0" Command="{Binding StartTimerCommand}"  VerticalContentAlignment="Stretch" HorizontalAlignment="Left" Padding="0" Click="Button_Click_1">
                     <Grid  Width="20" Height="20">
                         <Grid>
                             <Rectangle Visibility="Visible" RadiusY="2.625" RadiusX="2.625">
@@ -102,7 +87,7 @@
                                 </Rectangle.Fill>
                             </Rectangle>
                         </Grid>
-                        <Path Stretch="Uniform" Style="{Binding Source={StaticResource PlayIcoStyle}}" Height="11" Margin="2.937,4.5,3.062,4.5" Width="11"></Path>
+                        <Path Stretch="Uniform" Style="{StaticResource PlayPauseIcoStyle}" Height="11" Margin="2.937,4.5,3.062,4.5" Width="11"></Path>
                     </Grid>
                 </Button>
                 <Button BorderThickness="0" Background="Transparent"  Width="20" Height="20" Margin="0,0,4,0" VerticalContentAlignment="Stretch" HorizontalAlignment="Left" Padding="0">
@@ -116,11 +101,10 @@
                         </Grid>
                         <Path Stretch="Uniform" Style="{Binding Source={StaticResource StopIcoStyle}}" Margin="5" />
                     </Grid>
-
                 </Button>
                 <TextBlock Text="{Binding Timer, StringFormat='HH:mm:ss'}" Margin="5,0,0,0" FontWeight="Bold" FontSize="14.667"></TextBlock>
             </StackPanel>
-            <StackPanel Grid.Column="1" Orientation="Horizontal">
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Width="93">
                 <TextBlock Text="More info" Margin="7"></TextBlock>
                 <Expander Margin="0,7,0,0"></Expander>
             </StackPanel>

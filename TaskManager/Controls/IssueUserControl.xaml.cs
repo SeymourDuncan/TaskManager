@@ -107,6 +107,24 @@ namespace TaskManager.Controls
         {
             IsActive = !IsActive;
         }
+
+        public static readonly DependencyProperty IsRunningProperty = DependencyProperty.Register("IsRunning", typeof(bool), typeof(IssueUserControl));
+        public bool IsRunning
+        {
+            get
+            {
+                return (bool)GetValue(IsRunningProperty);
+            }
+            set
+            {
+                SetValue(IsRunningProperty, value);
+            }
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            IsRunning = !IsRunning;
+        }
     }
 
     [ValueConversion(typeof(bool), typeof(Visibility))]
