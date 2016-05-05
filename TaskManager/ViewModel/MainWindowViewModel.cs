@@ -6,6 +6,7 @@ using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
 using GalaSoft.MvvmLight;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -15,6 +16,7 @@ using GalaSoft.MvvmLight.Messaging;
 using Redmine.Net.Api.Types;
 using TaskManager.Model;
 using TaskManager.View;
+using System.Globalization;
 
 namespace TaskManager.ViewModel
 {
@@ -36,6 +38,8 @@ namespace TaskManager.ViewModel
         private ICommand _settingsCommand;
         private ICommand _startCommand;
         private readonly DispatcherTimer _dispatcherTimer = new DispatcherTimer();
+        private DateTime _startTimePoint;
+        private long _accumActiveTicks;
 
         #endregion
 
@@ -51,7 +55,7 @@ namespace TaskManager.ViewModel
                 LoginButtonCaption = _isConnected ? "Logout" : "Login";
             }
         }
-
+        
         public string Title { get; set; } = "Task Manager";
         public bool MainBusy
         {
@@ -157,8 +161,7 @@ namespace TaskManager.ViewModel
             })); }
         }
         
-
-        private DateTime startTimePoint;
+        
         public ICommand StartCommand
         {
             get
@@ -167,12 +170,13 @@ namespace TaskManager.ViewModel
                 {
                     if (_dispatcherTimer.IsEnabled)
                     {
-                        _dispatcherTimer.Stop();
-                        var span = _dispatcherTimer.Interval;                                                
+                        _dispatcherTimer.Stop();                                                                        
                     }
                     else
                     {
-                        startTimePoint = DateTime.Now;
+                        // запомним сколько времени уже было у задачи
+                        _accumActiveTicks = TrackedIssues.ActiveIssue.TrackedTime;
+                        _startTimePoint = DateTime.Now;
                         _dispatcherTimer.Interval = TimeSpan.FromSeconds(1);
                         _dispatcherTimer.Tick += _dispatcherTimer_Tick;
                         _dispatcherTimer.Start();
@@ -184,10 +188,8 @@ namespace TaskManager.ViewModel
 
         private void _dispatcherTimer_Tick(object sender, EventArgs e)
         {
-            long tick = DateTime.Now.Ticks - startTimePoint.Ticks;
-            DateTime stopWatch = new DateTime();
-            stopWatch = stopWatch.AddTicks(tick);
-            
+            var tick = DateTime.Now.Ticks - _startTimePoint.Ticks;            
+            TrackedIssues.ActiveIssue.TrackedTime = tick + _accumActiveTicks;                      
         }
 
         #endregion
@@ -256,5 +258,19 @@ namespace TaskManager.ViewModel
 #endregion
     }
 
- 
+    [ValueConversion(typeof(long), typeof(DateTime))]
+    public class TicksToDateTimeConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var ticks = (long) value;
+            return new DateTime(ticks);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
 }

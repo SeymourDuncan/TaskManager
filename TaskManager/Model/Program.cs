@@ -117,6 +117,7 @@ namespace TaskManager.Model
     public class TrackedIssue: ObservableObject
     {
         private bool _isActive;
+        private long _trackedTime;
         public Issue IssueItem { get; set; }
 
         public bool IsActive
@@ -131,7 +132,18 @@ namespace TaskManager.Model
             }
         }
 
-        public DateTime TrackedTime { get; set; }        
+        public long TrackedTime
+        {
+            get
+            {
+                return _trackedTime;                
+            }
+            set
+            {
+                _trackedTime = value;
+                RaisePropertyChanged();
+            }
+        }
 
         public event EventHandler IsActiveChanged;
 

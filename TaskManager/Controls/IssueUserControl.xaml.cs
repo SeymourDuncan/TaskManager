@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -82,14 +83,14 @@ namespace TaskManager.Controls
             set { SetValue(IssueNamePropery, value); }
         }
 
-        public static readonly DependencyProperty TimerPropery = DependencyProperty.Register("Timer", typeof(string), typeof(IssueUserControl), new PropertyMetadata("00:00:00"));
-        public string Timer
+        public static readonly DependencyProperty TimerPropery = DependencyProperty.Register("Timer", typeof(DateTime), typeof(IssueUserControl), new UIPropertyMetadata(new DateTime()));
+        public DateTime Timer
         {
-            get { return (String)GetValue(TimerPropery); }
+            get { return (DateTime)GetValue(TimerPropery); }
             set { SetValue(TimerPropery, value); }
         }
 
-        public static readonly DependencyProperty StartTimerCommandProperty = DependencyProperty.Register("StartTimerCommand", typeof(ICommand), typeof(IssueUserControl), new PropertyMetadata(null));
+        public static readonly DependencyProperty StartTimerCommandProperty = DependencyProperty.Register("StartTimerCommand", typeof(ICommand), typeof(IssueUserControl));
         public ICommand StartTimerCommand
         {
             get
@@ -106,19 +107,35 @@ namespace TaskManager.Controls
         {
             IsActive = !IsActive;
         }
-
-
-
-
-
-
-        //public static readonly DependencyProperty ParameterCommandProperty = DependencyProperty.Register("ParameterCommand", typeof(object), typeof(IssueUserControl), new PropertyMetadata(null));
-        //public object ParameterCommand
-        //{
-        //    get { return (object)GetValue(ParameterCommandProperty); }
-        //    set { SetValue(ParameterCommandProperty, value); }
-        //}
     }
 
-  
+    [ValueConversion(typeof(bool), typeof(Visibility))]
+    public class InvertBoolToVisConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool booleanValue = (bool)value;            
+            return booleanValue? Visibility.Hidden : Visibility.Visible;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return null;
+        }
+    }
+
+    [ValueConversion(typeof(bool), typeof(Visibility))]
+    public class BoolToVisConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool booleanValue = (bool)value;
+            return booleanValue ? Visibility.Visible : Visibility.Hidden;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return null;
+        }
+    }
 }
