@@ -147,6 +147,7 @@ namespace TaskManager.Model
             }
         }
 
+        [ScriptIgnore]
         public bool IsRunning
         {
             get { return _isRunning; }
@@ -268,10 +269,15 @@ namespace TaskManager.Model
         }
         private void ActiveIssueChanged(object sender, EventArgs args)
         {
+            // активной может быть только одна задача,
+            // поэтому каждый раз выставляя задаче статус "активная", снимем "активность" с предыдущей
+            // TODO список задач слушает изменения каждой задачи, что не есть хорошо. Как сделать красиво???
+            
             var iss = (TrackedIssue) sender;
             if (ActiveIssue != null)
                 ActiveIssue.IsActive = false;            
             ActiveIssue = iss;
+            // BUG хочу сортировать задачи, чтоб активная перестасивалась в начало списка, но ловлю багу
             //ActiveIssueToFirstPosition();
         }        
 

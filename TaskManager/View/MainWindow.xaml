@@ -58,8 +58,8 @@
                     <Path Stretch="Uniform" Style="{Binding Source={StaticResource AddIssueIcoStyle}}" />
                 </Button>
             </Grid>
-            
-            <ListBox x:Name="listBox" Margin="5" ItemsSource="{Binding TrackedIssues.Items, Mode=TwoWay}" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+
+            <ListBox x:Name="listBox" Margin="5" ItemsSource="{Binding TrackedIssues.Items, Mode=TwoWay}" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility ="Visible">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <ctrls:IssueUserControl

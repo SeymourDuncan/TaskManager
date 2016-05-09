@@ -63,6 +63,16 @@ namespace TaskManager.Controls
             get { return (TrackedIssue)GetValue(TrackedIssuePropery); }
             set { SetValue(TrackedIssuePropery, value); }
         }
+
+        private void Expander_Collapsed(object sender, RoutedEventArgs e)
+        {
+            AdditionalInfo.Visibility = Visibility.Collapsed;
+        }
+
+        private void Expander_Expanded(object sender, RoutedEventArgs e)
+        {
+            AdditionalInfo.Visibility = Visibility.Visible;
+        }
     }
 
     [ValueConversion(typeof(bool), typeof(Visibility))]
