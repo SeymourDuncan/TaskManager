@@ -10,9 +10,6 @@
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         Title="{Binding Title}" Height="341.6" Width="336.6" ResizeMode="NoResize"
         DataContext="{Binding MainViewModel, Source={StaticResource Locator}}">
-    <Window.Resources>
-        <local:TicksToDateTimeConverter x:Key="TicksToDateTimeConverter"/>
-    </Window.Resources>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding LoadedCommand}"/>
@@ -66,13 +63,9 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <ctrls:IssueUserControl
-                            CloseCommand="{Binding Path=DataContext.CloseIssueCommand, RelativeSource={RelativeSource AncestorType={x:Type DockPanel}}}"
-                            CloseCommandParameter="{Binding}"
-                            IssueName="{Binding IssueItem.Subject}"
-                            StartTimerCommand="{Binding DataContext.StartCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DockPanel}}}"
-                            IsActive="{Binding IsActive, Mode=TwoWay}"
-                            Timer ="{Binding TrackedTime, Converter={StaticResource TicksToDateTimeConverter}}"
-                         />
+                            CloseCommand="{Binding Path=DataContext.CloseIssueCommand, RelativeSource={RelativeSource AncestorType={x:Type DockPanel}}}"                            
+                            TrackedIssue="{Binding}"                                                         
+                            />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>

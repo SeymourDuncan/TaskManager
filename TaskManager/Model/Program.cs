@@ -10,6 +10,9 @@ using GalaSoft.MvvmLight;
 using Redmine.Net.Api;
 using Redmine.Net.Api.Types;
 using System.Web.Script.Serialization;
+using System.Windows.Input;
+using System.Windows.Threading;
+using GalaSoft.MvvmLight.Command;
 
 namespace TaskManager.Model
 {
@@ -55,12 +58,16 @@ namespace TaskManager.Model
             {
                 var parameters = new NameValueCollection
                 {
+                    //{ RedmineKeys.STATUS_ID, "open" },
+                    //{ RedmineKeys.ASSIGNED_TO_ID, "me" },
+                    //{ RedmineKeys.OFFSET, Offset.ToString() },
+                    //{ RedmineKeys.LIMIT, issuesLimit.ToString() }
                     { "status_id", "open" },
                     { "assigned_to_id", "me" },
                     { "offset", Offset.ToString() },
                     { "limit", issuesLimit.ToString() }
                 };
-                var issues = RedmineMng.GetObjectList<Issue>(parameters);
+                var issues = RedmineMng.GetObjectList<Issue>(parameters);                
                 Offset += issuesLimit;               
                 return issues;                
             }
@@ -126,9 +133,35 @@ namespace TaskManager.Model
             set
             {
                 _isActive = value;
+                // если делаем активным, посылаем сообщение чтобы деактивировать последний
                 if (_isActive)
+                {
                     OnIsActiveChanged();
+                }               
+                // если деактивируем задачу, останавливаем таймер     
+                else
+                {
+                    IsRunning = false;
+                }
                 RaisePropertyChanged();                
+            }
+        }
+
+        public bool IsRunning
+        {
+            get { return _isRunning; }
+            set
+            {
+                _isRunning = value;
+                if (_isRunning)
+                {
+                    StartTimer();
+                }
+                else
+                {
+                    StopTimer();
+                }
+                RaisePropertyChanged();
             }
         }
 
@@ -151,6 +184,32 @@ namespace TaskManager.Model
         {
             var e = IsActiveChanged;
             e?.Invoke(this, null);
+        }
+
+        private readonly DispatcherTimer _dispatcherTimer = new DispatcherTimer();
+        private DateTime _startTimePoint;
+        private long _accumActiveTicks;
+        
+        private bool _isRunning;
+
+        private void StopTimer()
+        {
+            _dispatcherTimer.Stop();
+        }
+        public void StartTimer()
+        {
+            // запомним сколько времени уже было у задачи
+            _accumActiveTicks = TrackedTime;
+            _startTimePoint = DateTime.Now;
+            _dispatcherTimer.Interval = TimeSpan.FromSeconds(1);                        
+            _dispatcherTimer.Tick += _dispatcherTimer_Tick;
+            _dispatcherTimer.Start();
+        }
+
+        private void _dispatcherTimer_Tick(object sender, EventArgs e)
+        {
+            var tick = DateTime.Now.Ticks - _startTimePoint.Ticks;
+            TrackedTime = tick + _accumActiveTicks;
         }
     }
 

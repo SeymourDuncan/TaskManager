@@ -6,11 +6,12 @@
              xmlns:local="clr-namespace:TaskManager.Controls"             
              mc:Ignorable="d" BorderThickness="1" ScrollViewer.VerticalScrollBarVisibility="Disabled" VerticalAlignment="Top">
     <UserControl.Resources>
+        <local:TicksToDateTimeConverter x:Key="TicksToDateTimeConverter"/>
         <local:InvertBoolToVisConverter x:Key="InvertBoolToVisibilityConverter"/>
         <local:BoolToVisConverter x:Key="BoolToVisibilityConverter"/>
         <DataTemplate x:Key="ActiveTemp">
             <StackPanel Orientation="Horizontal" Margin="7">
-                <Button BorderThickness="0" Background="Transparent" Width="20" Height="20" Margin="0,0,4,0" Command="{Binding StartTimerCommand}"  VerticalContentAlignment="Stretch" HorizontalAlignment="Left" Padding="0">
+                <!--<Button BorderThickness="0" Background="Transparent" Width="20" Height="20" Margin="0,0,4,0" Command="{Binding StartTimerCommand}"  VerticalContentAlignment="Stretch" HorizontalAlignment="Left" Padding="0">
                     <Grid  Width="20" Height="20">
                         <Grid>
                             <Rectangle Visibility="Visible" RadiusY="2.625" RadiusX="2.625">
@@ -21,7 +22,7 @@
                         </Grid>
                         <Path Stretch="Uniform" Style="{Binding Source={StaticResource PlayIcoStyle}}" Height="11" Margin="2.937,4.5,3.062,4.5" Width="11"></Path>
                     </Grid>
-                </Button>                
+                </Button>-->                
                 <Button BorderThickness="0" Background="Transparent"  Width="20" Height="20" Margin="0,0,4,0" VerticalContentAlignment="Stretch" HorizontalAlignment="Left" Padding="0">
                     <Grid  Width="20" Height="20">
                         <Grid>
@@ -53,6 +54,33 @@
         <DataTemplate x:Key="NotActiveTemp">
             <Button Margin="7" Height="20" Content="Track this" Click="Button_Click"/>
         </DataTemplate>
+        <Style TargetType="Path" x:Key="PlayerIcoStyle">
+            <Setter Property="Width" Value="15" />
+            <Setter Property="Height" Value="15" />
+            <Setter Property="Fill" Value="White" />
+        </Style>
+        <Style x:Key="PlayPauseIcoStyle"  TargetType="Path" BasedOn="{StaticResource PlayerIcoStyle}">
+            <Setter Property="Data" Value="{StaticResource PlayIconGeometry}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=TrackedIssue.IsRunning}" Value="False">
+                    <Setter Property="Data" Value="{StaticResource PlayIconGeometry}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=TrackedIssue.IsRunning}" Value="True">
+                    <Setter Property="Data" Value="{StaticResource PauseIconGeometry}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="StopIcoStyle"  TargetType="Path" BasedOn="{StaticResource PlayerIcoStyle}">
+            <Setter Property="Data" Value="{StaticResource StopIconGeometry}"/>
+        </Style>
+
+        <Style x:Key="CloseIssueIcoStyle"  TargetType="Path" BasedOn="{StaticResource PlayerIcoStyle}">
+            <Setter Property="Data" Value="{StaticResource CloseIssueIconGeometry}"/>
+            <Setter Property="Width" Value="12" />
+            <Setter Property="Height" Value="12" />
+            <Setter Property="Fill" Value="#FF5F9EF3" />
+        </Style>
     </UserControl.Resources>
     <UserControl.BorderBrush>
         <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}"/>
@@ -66,8 +94,8 @@
             <ColumnDefinition/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <TextBlock x:Name="textBlock1" Text="{Binding IssueName}" Margin="7,3,3,3" TextWrapping="Wrap" Foreground="Black"/>
-        <Button x:Name="CloseButton"  Grid.Row="0" Grid.Column="1" BorderThickness="0" Background="Transparent" Width="12" Height="12" Padding="0" HorizontalAlignment="Right" Margin="0,7,7,0" VerticalAlignment="Top" Command="{Binding CloseCommand}" CommandParameter="{Binding CloseCommandParameter}">
+        <TextBlock x:Name="textBlock1" Text="{Binding TrackedIssue.IssueItem.Subject}" Margin="7,3,3,3" TextWrapping="Wrap" Foreground="Black"/>
+        <Button x:Name="CloseButton"  Grid.Row="0" Grid.Column="1" BorderThickness="0" Background="Transparent" Width="12" Height="12" Padding="0" HorizontalAlignment="Right" Margin="0,7,7,0" VerticalAlignment="Top" Command="{Binding CloseCommand}" CommandParameter="{Binding TrackedIssue}">
             <Path Stretch="Uniform" Style="{StaticResource CloseIssueIcoStyle}"/>
         </Button>
         <Grid Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2">
@@ -76,9 +104,9 @@
                 <ColumnDefinition/>
                 
             </Grid.ColumnDefinitions>
-            <Button Margin="7" Height="20" Content="Track this" Click="Button_Click" Visibility="{Binding Path=IsActive, Converter={StaticResource InvertBoolToVisibilityConverter}}"/>
-            <StackPanel Orientation="Horizontal" Margin="7" Visibility="{Binding Path=IsActive, Converter={StaticResource BoolToVisibilityConverter}}">
-                <Button BorderThickness="0" Background="Transparent" Width="20" Height="20" Margin="0,0,4,0" Command="{Binding StartTimerCommand}"  VerticalContentAlignment="Stretch" HorizontalAlignment="Left" Padding="0" Click="Button_Click_1">
+            <Button Margin="7" Height="20" Content="Track this" Click="Button_Click" Visibility="{Binding Path=TrackedIssue.IsActive, Converter={StaticResource InvertBoolToVisibilityConverter}}"/>
+            <StackPanel Orientation="Horizontal" Margin="7" Visibility="{Binding Path=TrackedIssue.IsActive, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Button BorderThickness="0" Background="Transparent" Width="20" Height="20" Margin="0,0,4,0" VerticalContentAlignment="Stretch" HorizontalAlignment="Left" Padding="0" Click="Button_Click_1">
                     <Grid  Width="20" Height="20">
                         <Grid>
                             <Rectangle Visibility="Visible" RadiusY="2.625" RadiusX="2.625">
@@ -102,7 +130,7 @@
                         <Path Stretch="Uniform" Style="{Binding Source={StaticResource StopIcoStyle}}" Margin="5" />
                     </Grid>
                 </Button>
-                <TextBlock Text="{Binding Timer, StringFormat='HH:mm:ss'}" Margin="5,0,0,0" FontWeight="Bold" FontSize="14.667"></TextBlock>
+                <TextBlock Text="{Binding TrackedIssue.TrackedTime, StringFormat='HH:mm:ss', Converter={StaticResource TicksToDateTimeConverter}}" Margin="5,0,0,0" FontWeight="Bold" FontSize="14.667"></TextBlock>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Width="93">
                 <TextBlock Text="More info" Margin="7"></TextBlock>

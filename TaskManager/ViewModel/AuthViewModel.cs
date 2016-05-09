@@ -39,6 +39,8 @@ namespace TaskManager.ViewModel
         public void Clear()
         {
             AuthErrorText = "";
+            // чистим подписки
+            OnStatusChange = null;
             Login = Properties.Settings.Default.Login;            
         }
         public bool Busy
@@ -101,6 +103,19 @@ namespace TaskManager.ViewModel
             OnStatusChange?.Invoke(this, Connection);
             Clear();
             CloseDialogAction();
+        }
+
+        private ICommand _closeByCrossCommand;
+        public ICommand CloseByCroosCommand
+        {
+            get
+            {
+                return _closeByCrossCommand ?? (_closeByCrossCommand = new RelayCommand(() =>
+                {
+                    OnStatusChange?.Invoke(this, Connection);
+                    Clear();
+                }));
+            }
         }
 
         public Action CloseDialogAction { get; set; }

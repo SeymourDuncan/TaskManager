@@ -18,12 +18,6 @@
         <Setter Property="Fill" Value="#FF5F9EF3" />
     </Style>
 
-    <Style TargetType="Path" x:Key="PlayerIcoStyle">
-        <Setter Property="Width" Value="15" />
-        <Setter Property="Height" Value="15" />
-        <Setter Property="Fill" Value="White" />
-    </Style>
-    
     <Style x:Key="AddIssueIcoStyle"  TargetType="Path" BasedOn="{StaticResource IcoStyle}">
         <Setter Property="Data" Value="{StaticResource AddIssueIconGeometry}"/>
     </Style>
@@ -31,27 +25,6 @@
         <Setter Property="Data" Value="{StaticResource SettingsIconGeometry}"/>
     </Style>
 
-    <Style x:Key="PlayPauseIcoStyle"  TargetType="Path" BasedOn="{StaticResource PlayerIcoStyle}">
-        <Setter Property="Data" Value="{StaticResource PlayIconGeometry}"/>
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Path=IsRunning}" Value="False">
-                <Setter Property="Data" Value="{StaticResource PlayIconGeometry}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Path=IsRunning}" Value="True">
-                <Setter Property="Data" Value="{StaticResource PauseIconGeometry}" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
     
-    <Style x:Key="StopIcoStyle"  TargetType="Path" BasedOn="{StaticResource PlayerIcoStyle}">
-        <Setter Property="Data" Value="{StaticResource StopIconGeometry}"/>
-    </Style>
-    
-    <Style x:Key="CloseIssueIcoStyle"  TargetType="Path" BasedOn="{StaticResource PlayerIcoStyle}">
-        <Setter Property="Data" Value="{StaticResource CloseIssueIconGeometry}"/>
-        <Setter Property="Width" Value="12" />
-        <Setter Property="Height" Value="12" />
-        <Setter Property="Fill" Value="#FF5F9EF3" />
-    </Style>
     
 </ResourceDictionary>

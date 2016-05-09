@@ -6,10 +6,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TaskManager.ViewModel"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         mc:Ignorable="d"
         Title="Authorization" Height="218.528" Width="300" ResizeMode="NoResize"
-        DataContext="{Binding AuthViewModel, Source={StaticResource Locator}}" Closing="Window_Closing">
-        
+        DataContext="{Binding AuthViewModel, Source={StaticResource Locator}}">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding CloseByCroosCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>    
     <xctk:BusyIndicator IsBusy="{Binding Busy}" BusyContent="Authorization...">
         <Grid Margin="0,0,-0.4,1.6">
             <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="50,35,0,0" TextWrapping="Wrap" Text="Login" VerticalAlignment="Top"/>

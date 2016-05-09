@@ -35,11 +35,7 @@ namespace TaskManager.ViewModel
         private ICommand _showIssuesSelectWindowCommand;
         
         private TrackedIssueList _trackedIssues;
-        private ICommand _settingsCommand;
-        private ICommand _startCommand;
-        private readonly DispatcherTimer _dispatcherTimer = new DispatcherTimer();
-        private DateTime _startTimePoint;
-        private long _accumActiveTicks;
+        private ICommand _settingsCommand;                
 
         #endregion
 
@@ -160,37 +156,8 @@ namespace TaskManager.ViewModel
                 TrackedIssues?.SaveToJsonFile();
             })); }
         }
-        
-        
-        public ICommand StartCommand
-        {
-            get
-            {
-                return _startCommand ?? (_startCommand = new RelayCommand(() =>
-                {
-                    if (_dispatcherTimer.IsEnabled)
-                    {
-                        _dispatcherTimer.Stop();                                                                        
-                    }
-                    else
-                    {
-                        // запомним сколько времени уже было у задачи
-                        _accumActiveTicks = TrackedIssues.ActiveIssue.TrackedTime;
-                        _startTimePoint = DateTime.Now;
-                        _dispatcherTimer.Interval = TimeSpan.FromSeconds(1);
-                        _dispatcherTimer.Tick += _dispatcherTimer_Tick;
-                        _dispatcherTimer.Start();
-                    }
-                    
-                }));                               
-            }
-        }
 
-        private void _dispatcherTimer_Tick(object sender, EventArgs e)
-        {
-            var tick = DateTime.Now.Ticks - _startTimePoint.Ticks;            
-            TrackedIssues.ActiveIssue.TrackedTime = tick + _accumActiveTicks;                      
-        }
+       
 
         #endregion
 
@@ -199,13 +166,13 @@ namespace TaskManager.ViewModel
         {
             // чистим пароль
             Properties.Settings.Default.Password = "";
+            Program.Instance.CurrentUser = "";
             Messenger.Default.Send(new ShowDialogMessage(DialogWindowTypes.DwAuth));           
         }
 
         private void ShowIssuesSelectWindow()
         {
-            Messenger.Default.Send(new ShowDialogMessage(DialogWindowTypes.DwIssueList));
-            //TrackedIssues.SaveToXmlFile();            
+            Messenger.Default.Send(new ShowDialogMessage(DialogWindowTypes.DwIssueList));            
             TrackedIssues.SaveToJsonFile();
         }
 
@@ -229,7 +196,7 @@ namespace TaskManager.ViewModel
         public void Init()
         {            
             // пробуем сходу законнектиться
-            MainBusy = true;
+           MainBusy = true;
            Task.Factory.StartNew(() =>
            {
                 IsConnected = program.Connect(Properties.Settings.Default.Login, Properties.Settings.Default.Password);
@@ -249,28 +216,12 @@ namespace TaskManager.ViewModel
                 }
 
             }, TaskScheduler.FromCurrentSynchronizationContext());
-         
-            // гарантированно возвращает TrackedIssueList   
+                     
             TrackedIssues = new TrackedIssueList();
             TrackedIssues.LoadFromJsonFile();
         }
 
 #endregion
     }
-
-    [ValueConversion(typeof(long), typeof(DateTime))]
-    public class TicksToDateTimeConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            var ticks = (long) value;
-            return new DateTime(ticks);
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
+   
 }

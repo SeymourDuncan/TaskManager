@@ -23,11 +23,6 @@ namespace TaskManager.View
         {
             InitializeComponent();
             
-        }
-
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            var qw = "were";
-        }
+        }        
     }
 }

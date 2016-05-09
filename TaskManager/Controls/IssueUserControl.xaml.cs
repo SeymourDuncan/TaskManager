@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using GalaSoft.MvvmLight.Command;
+using TaskManager.Model;
 
 namespace TaskManager.Controls
 {
@@ -29,7 +30,7 @@ namespace TaskManager.Controls
         }
 
         public static readonly DependencyProperty CloseCommandProperty =
-      DependencyProperty.Register(
+        DependencyProperty.Register(
            "CloseCommand",
            typeof(ICommand),
            typeof(IssueUserControl));
@@ -45,85 +46,22 @@ namespace TaskManager.Controls
                 SetValue(CloseCommandProperty, value);
             }
         }
-
-        public static readonly DependencyProperty CloseCommandParameterProperty =
-        DependencyProperty.Register(
-             "CloseCommandParameter",
-             typeof(object),
-             typeof(IssueUserControl));
-
-        public object CloseCommandParameter
-        {
-            get
-            {
-                return (object)GetValue(CloseCommandParameterProperty);
-            }
-            set
-            {
-                SetValue(CloseCommandParameterProperty, value);
-            }
-        }
-
-        public static readonly DependencyProperty IsActivePropery = DependencyProperty.Register("IsActive", typeof(bool), typeof(IssueUserControl), new PropertyMetadata(false));
-        public bool IsActive{
-            get
-            {
-                return (bool)GetValue(IsActivePropery);
-            }
-            set
-            {
-                SetValue(IsActivePropery, value);
-            }
-        }       
-
-        public static readonly DependencyProperty IssueNamePropery = DependencyProperty.Register("IssueName", typeof(string), typeof(IssueUserControl), new PropertyMetadata(""));
-        public string IssueName
-        {
-            get { return (String)GetValue(IssueNamePropery); }
-            set { SetValue(IssueNamePropery, value); }
-        }
-
-        public static readonly DependencyProperty TimerPropery = DependencyProperty.Register("Timer", typeof(DateTime), typeof(IssueUserControl), new UIPropertyMetadata(new DateTime()));
-        public DateTime Timer
-        {
-            get { return (DateTime)GetValue(TimerPropery); }
-            set { SetValue(TimerPropery, value); }
-        }
-
-        public static readonly DependencyProperty StartTimerCommandProperty = DependencyProperty.Register("StartTimerCommand", typeof(ICommand), typeof(IssueUserControl));
-        public ICommand StartTimerCommand
-        {
-            get
-            {
-                return (ICommand)GetValue(StartTimerCommandProperty);
-            }
-            set
-            {
-                SetValue(StartTimerCommandProperty, value);
-            }
-        }
-
+       
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            IsActive = !IsActive;
-        }
-
-        public static readonly DependencyProperty IsRunningProperty = DependencyProperty.Register("IsRunning", typeof(bool), typeof(IssueUserControl));
-        public bool IsRunning
-        {
-            get
-            {
-                return (bool)GetValue(IsRunningProperty);
-            }
-            set
-            {
-                SetValue(IsRunningProperty, value);
-            }
-        }
+            TrackedIssue.IsActive = !TrackedIssue.IsActive;
+        }       
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            IsRunning = !IsRunning;
+            TrackedIssue.IsRunning = !TrackedIssue.IsRunning;
+        }               
+
+        public static readonly DependencyProperty TrackedIssuePropery = DependencyProperty.Register("TrackedIssue", typeof(TrackedIssue), typeof(IssueUserControl), new PropertyMetadata(null));
+        public TrackedIssue TrackedIssue
+        {
+            get { return (TrackedIssue)GetValue(TrackedIssuePropery); }
+            set { SetValue(TrackedIssuePropery, value); }
         }
     }
 
@@ -154,6 +92,21 @@ namespace TaskManager.Controls
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return null;
+        }
+    }
+
+    [ValueConversion(typeof(long), typeof(DateTime))]
+    public class TicksToDateTimeConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var ticks = (long)value;
+            return new DateTime(ticks);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }
