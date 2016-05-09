@@ -23,6 +23,17 @@ namespace TaskManager.View
         public MainWindow()
         {
             InitializeComponent();
+            //this.Top = Properties.Settings.Default.Top;
+            //this.Left = Properties.Settings.Default.Left;
+            this.Height = Properties.Settings.Default.Height;            
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            //Properties.Settings.Default.Top = this.Top;
+            //Properties.Settings.Default.Left = this.Left;
+            Properties.Settings.Default.Height = this.Height;
+            Properties.Settings.Default.Save();
         }
     }
 }

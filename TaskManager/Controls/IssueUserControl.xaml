@@ -95,7 +95,11 @@
             <ColumnDefinition/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <TextBlock x:Name="textBlock1" Text="{Binding TrackedIssue.IssueItem.Subject}" Margin="7,3,3,3" TextWrapping="Wrap" Foreground="Black"/>
+        <StackPanel Margin="7,3,3,3">
+            <TextBlock x:Name="textBlock1" Text="{Binding TrackedIssue.IssueItem.Id, StringFormat=#{0}}"  TextWrapping="Wrap" Foreground="Black"/>
+            <TextBlock x:Name="textBlock2" Text="{Binding TrackedIssue.IssueItem.Subject}" TextWrapping="Wrap" Foreground="Black"/>
+        </StackPanel>
+        
         <Button x:Name="CloseButton"  Grid.Row="0" Grid.Column="1" BorderThickness="0" Background="Transparent" Width="12" Height="12" Padding="0" HorizontalAlignment="Right" Margin="0,7,7,0" VerticalAlignment="Top" Command="{Binding CloseCommand}" CommandParameter="{Binding TrackedIssue}">
             <Path Stretch="Uniform" Style="{StaticResource CloseIssueIcoStyle}"/>
         </Button>

@@ -8,8 +8,8 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-        Title="{Binding Title}" Height="341.6" Width="336.6" ResizeMode="NoResize"
-        DataContext="{Binding MainViewModel, Source={StaticResource Locator}}">
+        Title="{Binding Title}" Height="341.6" Width="336.6"
+        DataContext="{Binding MainViewModel, Source={StaticResource Locator}}" MaxWidth="336.6" MinWidth="336.6" MinHeight="341.6" Closing="Window_Closing">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding LoadedCommand}"/>
@@ -59,7 +59,7 @@
                 </Button>
             </Grid>
 
-            <ListBox x:Name="listBox" Margin="5" ItemsSource="{Binding TrackedIssues.Items, Mode=TwoWay}" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility ="Visible">
+            <ListBox x:Name="listBox" Margin="5" ItemsSource="{Binding TrackedIssues.Items, Mode=TwoWay}" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility ="Visible" ScrollViewer.CanContentScroll="False">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <ctrls:IssueUserControl
