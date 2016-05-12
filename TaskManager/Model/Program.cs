@@ -13,6 +13,7 @@ using System.Web.Script.Serialization;
 using System.Windows.Input;
 using System.Windows.Threading;
 using GalaSoft.MvvmLight.Command;
+using Redmine.Net.Api.JSonConverters;
 
 namespace TaskManager.Model
 {
@@ -57,11 +58,7 @@ namespace TaskManager.Model
             try
             {
                 var parameters = new NameValueCollection
-                {
-                    //{ RedmineKeys.STATUS_ID, "open" },
-                    //{ RedmineKeys.ASSIGNED_TO_ID, "me" },
-                    //{ RedmineKeys.OFFSET, Offset.ToString() },
-                    //{ RedmineKeys.LIMIT, issuesLimit.ToString() }
+                { 
                     { "status_id", "open" },
                     { "assigned_to_id", "me" },
                     { "offset", Offset.ToString() },
@@ -192,6 +189,7 @@ namespace TaskManager.Model
         private long _accumActiveTicks;
         
         private bool _isRunning;
+        private ICommand _commitCommand;
 
         private void StopTimer()
         {
@@ -211,6 +209,48 @@ namespace TaskManager.Model
         {
             var tick = DateTime.Now.Ticks - _startTimePoint.Ticks;
             TrackedTime = tick + _accumActiveTicks;
+        }
+
+        private void CommitIssue(CommitParameters comParams)
+        {            
+            var dt = new DateTime(_trackedTime);
+            var zeroDate = new DateTime();
+            var qwe = dt - zeroDate;            
+            string hours = $"{qwe.TotalHours:0.##}";
+
+            var acts = Program.Instance.RedmineMng.GetObjectList<TimeEntryActivity>(new NameValueCollection() {});
+            try
+            {
+                var timeEntry = new TimeEntry()
+                {
+                    Issue = new IdentifiableName() {Id = IssueItem.Id},
+                    Activity = new IdentifiableName() {Id = 9}, // пока Программирование
+                    Comments = comParams.Comment,
+                    CreatedOn = DateTime.Now,
+                    CustomFields = null,
+                    Hours = (decimal) qwe.TotalHours
+                };
+
+                Program.Instance.RedmineMng.CreateObject(timeEntry);
+            }
+            catch (Exception e)
+            {
+                return;
+            }
+            
+
+        }
+        public ICommand CommitCommand
+        {
+            get
+            {
+                return _commitCommand ?? (_commitCommand = new RelayCommand<object>((obj) =>
+                {
+                    if (!(obj is CommitParameters))
+                        return;
+                    CommitIssue((CommitParameters) obj);
+                }));
+            }            
         }
     }
 
@@ -348,5 +388,11 @@ namespace TaskManager.Model
             list[indexA] = list[indexB];
             list[indexB] = tmp;
         }
+    }
+
+    public class CommitParameters
+    {
+        public string Comment { get; set; }
+        public bool SolveIssue { get; set; }
     }
 }

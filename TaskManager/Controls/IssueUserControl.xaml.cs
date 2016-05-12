@@ -46,7 +46,7 @@ namespace TaskManager.Controls
                 SetValue(CloseCommandProperty, value);
             }
         }
-       
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             TrackedIssue.IsActive = !TrackedIssue.IsActive;
@@ -72,6 +72,21 @@ namespace TaskManager.Controls
         private void Expander_Expanded(object sender, RoutedEventArgs e)
         {
             AdditionalInfo.Visibility = Visibility.Visible;
+        }
+
+        private void ShowCommitBtn_Click(object sender, RoutedEventArgs e)
+        {
+            // останавливаем если запущена
+            if (TrackedIssue.IsRunning)
+            {
+                TrackedIssue.IsRunning = false;
+            }
+            CommitField.Visibility = Visibility.Visible;
+        }
+
+        private void CancelCommitBtn_Click(object sender, RoutedEventArgs e)
+        {
+            CommitField.Visibility = Visibility.Collapsed;
         }
     }
 
@@ -115,6 +130,58 @@ namespace TaskManager.Controls
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    [ValueConversion(typeof(long), typeof(double))]
+    public class TicksToHoursConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var ticks = (long)value;
+            var dt = new DateTime(ticks);
+            var zeroDate = new DateTime();
+            var qwe = dt - zeroDate;
+            return qwe.TotalHours;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    [ValueConversion(typeof(long), typeof(double))]
+    public class TicksToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var ticks = (long)value;
+            return (ticks == 0) ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class CommitMultiConverter: IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            var comment = (string)values[0];
+            var solveIss = (bool) values[1];
+            var commitParam = new CommitParameters()
+            {
+                Comment = comment, SolveIssue = solveIss
+            };
+            return commitParam;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

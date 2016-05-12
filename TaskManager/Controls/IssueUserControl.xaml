@@ -7,53 +7,11 @@
              mc:Ignorable="d" BorderThickness="1" ScrollViewer.VerticalScrollBarVisibility="Disabled" VerticalAlignment="Top">
     <UserControl.Resources>
         <local:TicksToDateTimeConverter x:Key="TicksToDateTimeConverter"/>
+        <local:TicksToHoursConverter x:Key="TicksToHoursConverter"/>
         <local:InvertBoolToVisConverter x:Key="InvertBoolToVisibilityConverter"/>
         <local:BoolToVisConverter x:Key="BoolToVisibilityConverter"/>
-        <DataTemplate x:Key="ActiveTemp">
-            <StackPanel Orientation="Horizontal" Margin="7">
-                <!--<Button BorderThickness="0" Background="Transparent" Width="20" Height="20" Margin="0,0,4,0" Command="{Binding StartTimerCommand}"  VerticalContentAlignment="Stretch" HorizontalAlignment="Left" Padding="0">
-                    <Grid  Width="20" Height="20">
-                        <Grid>
-                            <Rectangle Visibility="Visible" RadiusY="2.625" RadiusX="2.625">
-                                <Rectangle.Fill>
-                                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.HighlightColorKey}}"/>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                        </Grid>
-                        <Path Stretch="Uniform" Style="{Binding Source={StaticResource PlayIcoStyle}}" Height="11" Margin="2.937,4.5,3.062,4.5" Width="11"></Path>
-                    </Grid>
-                </Button>-->                
-                <Button BorderThickness="0" Background="Transparent"  Width="20" Height="20" Margin="0,0,4,0" VerticalContentAlignment="Stretch" HorizontalAlignment="Left" Padding="0">
-                    <Grid  Width="20" Height="20">
-                        <Grid>
-                            <Rectangle Visibility="Visible" RadiusY="2.625" RadiusX="2.625">
-                                <Rectangle.Fill>
-                                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.HighlightColorKey}}"/>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                        </Grid>
-                        <Path Stretch="Uniform" Style="{Binding Source={StaticResource StopIcoStyle}}" Margin="5" />
-                    </Grid>
-
-                </Button>
-                <!--<Button BorderThickness="0" Background="Transparent" Width="20" Height="20" Margin="0,0,4,0" VerticalAlignment="Top" VerticalContentAlignment="Stretch" HorizontalAlignment="Left" Padding="0">
-                    <Grid  Width="20" Height="20">
-                        <Grid>
-                            <Rectangle Visibility="Visible" RadiusY="2.625" RadiusX="2.625">
-                                <Rectangle.Fill>
-                                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.HighlightColorKey}}"/>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                        </Grid>
-                        <Path Stretch="Uniform" Style="{Binding Source={StaticResource PauseIcoStyle}}" Width="Auto" Height="Auto" Margin="5"/>
-                    </Grid>
-                </Button>-->
-                <TextBlock Text="{Binding Timer, StringFormat='HH:mm:ss'}" Margin="5,0,0,0" FontWeight="Bold" FontSize="14.667"></TextBlock>
-            </StackPanel>
-        </DataTemplate>
-        <DataTemplate x:Key="NotActiveTemp">
-            <Button Margin="7" Height="20" Content="Track this" Click="Button_Click"/>
-        </DataTemplate>
+        <local:TicksToVisibilityConverter x:Key="TicksToVisibilityConverter"/>
+        <local:CommitMultiConverter x:Key="CommitMultiConverter"/>
         <Style TargetType="Path" x:Key="PlayerIcoStyle">
             <Setter Property="Width" Value="15" />
             <Setter Property="Height" Value="15" />
@@ -90,6 +48,7 @@
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -99,7 +58,7 @@
             <TextBlock x:Name="textBlock1" Text="{Binding TrackedIssue.IssueItem.Id, StringFormat=#{0}}"  TextWrapping="Wrap" Foreground="Black"/>
             <TextBlock x:Name="textBlock2" Text="{Binding TrackedIssue.IssueItem.Subject}" TextWrapping="Wrap" Foreground="Black"/>
         </StackPanel>
-        
+       
         <Button x:Name="CloseButton"  Grid.Row="0" Grid.Column="1" BorderThickness="0" Background="Transparent" Width="12" Height="12" Padding="0" HorizontalAlignment="Right" Margin="0,7,7,0" VerticalAlignment="Top" Command="{Binding CloseCommand}" CommandParameter="{Binding TrackedIssue}">
             <Path Stretch="Uniform" Style="{StaticResource CloseIssueIcoStyle}"/>
         </Button>
@@ -112,37 +71,64 @@
             <Button Margin="7" Height="20" Content="Track this" Click="Button_Click" Visibility="{Binding Path=TrackedIssue.IsActive, Converter={StaticResource InvertBoolToVisibilityConverter}}" Background="Transparent"/>
             <StackPanel Orientation="Horizontal" Margin="7" Visibility="{Binding Path=TrackedIssue.IsActive, Converter={StaticResource BoolToVisibilityConverter}}">
                 <Button BorderThickness="0" Background="Transparent" Width="20" Height="20" Margin="0,0,4,0" HorizontalAlignment="Left" Padding="0" Click="Button_Click_1">
-                    <Grid  Width="20" Height="20">
-                        <Grid>
-                            <Rectangle Visibility="Visible" RadiusY="2.625" RadiusX="2.625">
-                                <Rectangle.Fill>
-                                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.HighlightColorKey}}"/>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                        </Grid>
+                    <Grid Width="20" Height="20">
+                        <Rectangle x:Name="BcgRect" Visibility="Visible" RadiusY="2.625" RadiusX="2.625">
+                            <Rectangle.Style>
+                                <Style TargetType="Rectangle">
+                                    <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                                </Style>
+                            </Rectangle.Style>
+                        </Rectangle>
                         <Path Stretch="Uniform" Style="{StaticResource PlayPauseIcoStyle}" Height="11" Margin="2.937,4.5,3.062,4.5" Width="11"></Path>
                     </Grid>
                 </Button>
-                <Button BorderThickness="0" Background="Transparent"  Width="20" Height="20" Margin="0,0,4,0" HorizontalAlignment="Left" Padding="0">
+                <Button x:Name="ShowCommitBtn" Visibility="{Binding TrackedIssue.TrackedTime, Converter={StaticResource TicksToVisibilityConverter}}" BorderThickness="0" Background="Transparent"  Width="20" Height="20" Margin="0,0,4,0" HorizontalAlignment="Left" Padding="0" Click="ShowCommitBtn_Click">
                     <Grid  Width="20" Height="20">
-                        <Grid>
-                            <Rectangle Visibility="Visible" RadiusY="2.625" RadiusX="2.625">
-                                <Rectangle.Fill>
-                                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.HighlightColorKey}}"/>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                        </Grid>
+                        <Rectangle Visibility="Visible" RadiusY="2.625" RadiusX="2.625">
+                            <Rectangle.Fill>
+                                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.HighlightColorKey}}"/>
+                            </Rectangle.Fill>
+                        </Rectangle>
                         <Path Stretch="Uniform" Style="{Binding Source={StaticResource StopIcoStyle}}" Margin="5" />
                     </Grid>
                 </Button>
                 <TextBlock Text="{Binding TrackedIssue.TrackedTime, StringFormat='HH:mm:ss', Converter={StaticResource TicksToDateTimeConverter}}" Margin="5,0,0,0" FontWeight="Bold" FontSize="14.667"></TextBlock>
             </StackPanel>
-            <Expander Grid.Column="1" Margin="0,7,0,0" Header="More info" Width="93" HorizontalAlignment="Right" Collapsed="Expander_Collapsed" Expanded="Expander_Expanded">
-                
-            </Expander>
+            <Expander Grid.Column="1" Margin="0,7,0,0" Header="More info" Width="93" HorizontalAlignment="Right" Collapsed="Expander_Collapsed" Expanded="Expander_Expanded" />
 
         </Grid>
-        <Grid x:Name="AdditionalInfo" Grid.Row="2" Grid.ColumnSpan="2" Margin="3" Visibility="Collapsed">
+        <Grid x:Name="CommitField" Grid.Row="2" Grid.ColumnSpan="2" Margin="7" Visibility="Collapsed">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition Height="30"></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <TextBlock Text="Commit spent time" Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="0,0,0,3" FontSize="13.333" FontWeight="Bold"/>
+            <TextBlock Text="Spent time, h:" Grid.Row="1" HorizontalAlignment="Left" Margin="0,0,0,3"/>
+            <TextBox Text="{Binding TrackedIssue.TrackedTime, StringFormat='0.00', Converter={StaticResource TicksToHoursConverter}}" Grid.Row="1" Grid.Column="1" IsReadOnly="True" Margin="0,0,0,3" />
+            <CheckBox x:Name="SolveIssCb" Content="Solve issue" Grid.Row="2" HorizontalAlignment="Left" Margin="0,0,0,3"/>
+            <TextBlock  Text="Comment:" Grid.Row="3" HorizontalAlignment="Left" Margin="0,0,0,3"/>
+            <TextBox x:Name="CommantTb" Grid.Row="4" Grid.ColumnSpan="2" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,0,0,3"/>
+            <StackPanel Grid.Row="5" Grid.ColumnSpan="2" Orientation="Horizontal" FlowDirection="RightToLeft">
+                <Button x:Name="CancelCommitBtn" Content="Cancel" Width="60" Click="CancelCommitBtn_Click"></Button>
+                <Button x:Name="GoCommitBtn" Content="Commit" Margin="10,0,0,0" Width="60" Command="{Binding TrackedIssue.CommitCommand}">
+                    <Button.CommandParameter>
+                        <MultiBinding Converter="{StaticResource CommitMultiConverter}">
+                            <Binding Path="Text" ElementName="CommantTb"></Binding>
+                            <Binding Path="IsChecked" ElementName="SolveIssCb"></Binding>
+                        </MultiBinding>
+                    </Button.CommandParameter>
+                </Button>
+            </StackPanel>
+        </Grid>
+        <Grid x:Name="AdditionalInfo" Grid.Row="3" Grid.ColumnSpan="2" Margin="3" Visibility="Collapsed">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
@@ -152,12 +138,13 @@
                 <RowDefinition></RowDefinition>
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
-            <TextBlock Text="Project name:" Grid.Row="0"/>
-            <TextBlock Text="Estimated time, h:" Grid.Row="1"/>
-            <TextBlock Text="Author:" Grid.Row="2"/>
+            <TextBlock Text="Project name:" Grid.Row="0" Margin="0,0,0,3" TextDecorations="{x:Null}" FontWeight="Bold"/>
+            <TextBlock Text="Estimated time, h:" Grid.Row="1" Margin="0,0,0,3" FontWeight="Bold"/>
+            <TextBlock Text="Author:" Grid.Row="2" Margin="0,0,0,3" FontWeight="Bold"/>
             <TextBlock TextWrapping="Wrap" Text="{Binding TrackedIssue.IssueItem.Project.Name}" Grid.Row="0" Grid.Column="1"/>
             <TextBlock TextWrapping="Wrap" Text="{Binding TrackedIssue.IssueItem.EstimatedHours}" Grid.Row="1" Grid.Column="1"/>
             <TextBlock TextWrapping="Wrap" Text="{Binding TrackedIssue.IssueItem.Author.Name}" Grid.Row="2" Grid.Column="1"/>
         </Grid>
     </Grid>
 </UserControl>
+
