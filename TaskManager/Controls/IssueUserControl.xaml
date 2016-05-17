@@ -97,7 +97,7 @@
             <Expander Grid.Column="1" Margin="0,7,0,0" Header="More info" Width="93" HorizontalAlignment="Right" Collapsed="Expander_Collapsed" Expanded="Expander_Expanded" />
 
         </Grid>
-        <Grid x:Name="CommitField" Grid.Row="2" Grid.ColumnSpan="2" Margin="7" Visibility="Collapsed">
+        <Grid x:Name="CommitField" Grid.Row="2" Grid.ColumnSpan="2" Margin="7" Visibility="Visible">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
@@ -113,16 +113,16 @@
             <TextBlock Text="Commit spent time" Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="0,0,0,3" FontSize="13.333" FontWeight="Bold"/>
             <TextBlock Text="Spent time, h:" Grid.Row="1" HorizontalAlignment="Left" Margin="0,0,0,3"/>
             <TextBox Text="{Binding TrackedIssue.TrackedTime, StringFormat='0.00', Converter={StaticResource TicksToHoursConverter}}" Grid.Row="1" Grid.Column="1" IsReadOnly="True" Margin="0,0,0,3" />
-            <CheckBox x:Name="SolveIssCb" Content="Solve issue" Grid.Row="2" HorizontalAlignment="Left" Margin="0,0,0,3"/>
+            <ComboBox x:Name="ActiveCb" Grid.Row="2" Grid.ColumnSpan="2" ItemsSource="{Binding ActivityList}" DisplayMemberPath="Name" SelectedIndex="0"  HorizontalAlignment="Left" Margin="0,0,0,3" MinWidth="100"/>
             <TextBlock  Text="Comment:" Grid.Row="3" HorizontalAlignment="Left" Margin="0,0,0,3"/>
             <TextBox x:Name="CommantTb" Grid.Row="4" Grid.ColumnSpan="2" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,0,0,3"/>
             <StackPanel Grid.Row="5" Grid.ColumnSpan="2" Orientation="Horizontal" FlowDirection="RightToLeft">
                 <Button x:Name="CancelCommitBtn" Content="Cancel" Width="60" Click="CancelCommitBtn_Click"></Button>
-                <Button x:Name="GoCommitBtn" Content="Commit" Margin="10,0,0,0" Width="60" Command="{Binding TrackedIssue.CommitCommand}">
+                <Button x:Name="GoCommitBtn" Content="Commit" Margin="10,0,0,0" Width="60" Command="{Binding TrackedIssue.CommitCommand}" Click="GoCommitBtn_Click">
                     <Button.CommandParameter>
                         <MultiBinding Converter="{StaticResource CommitMultiConverter}">
                             <Binding Path="Text" ElementName="CommantTb"></Binding>
-                            <Binding Path="IsChecked" ElementName="SolveIssCb"></Binding>
+                            <Binding Path="SelectedItem" ElementName="ActiveCb"></Binding>
                         </MultiBinding>
                     </Button.CommandParameter>
                 </Button>

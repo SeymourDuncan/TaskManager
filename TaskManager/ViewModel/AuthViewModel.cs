@@ -21,27 +21,36 @@ namespace TaskManager.ViewModel
         private ICommand _submitRegCommand;
         private string _authErrorText;
         private bool _busy;
-        private string _login;
+        private string _host;
+        private string _apikey;
 
-        public ConnectionStatus Connection { get; set; } = ConnectionStatus.Logout;
+        public bool Connection { get; set; } = false;
 
-        public string Login
+        public string Host
         {
-            get { return _login; }
+            get { return _host; }
             set
             {
-                _login = value;
-                RaisePropertyChanged(()=>Login);
+                _host = value;
+                RaisePropertyChanged(()=> Host);
+            }
+        }
+        public string ApiKey
+        {
+            get { return _apikey; }
+            set
+            {
+                _apikey = value;
+                RaisePropertyChanged(() => ApiKey);
             }
         }
 
 
         public void Clear()
         {
-            AuthErrorText = "";
-            // чистим подписки
-            OnStatusChange = null;
-            Login = Properties.Settings.Default.Login;            
+            AuthErrorText = "";              
+            Host = Properties.Settings.Default.Host;
+            ApiKey = Properties.Settings.Default.Apikey;
         }
         public bool Busy
         {
@@ -63,44 +72,35 @@ namespace TaskManager.ViewModel
             }
         }
 
-        public ICommand SubmitRegCommand => _submitRegCommand?? (_submitRegCommand = new RelayCommand<object>((param) =>
+        public ICommand SubmitRegCommand => _submitRegCommand?? (_submitRegCommand = new RelayCommand(() =>
         {
-            var password = ((PasswordBox)param) ?.Password;
-
             Busy = true;
             
             var connTask = Task.Factory.StartNew(() =>
             {
-                Connection = Program.Instance.Connect(Login, password) ? ConnectionStatus.ConnectionSuccessed : ConnectionStatus.ConnectionFailed;
+                Connection = Program.Instance.Connect(Host, ApiKey);
             }).ContinueWith((task) =>
             {
                 Busy = false;
-                if (Connection == ConnectionStatus.ConnectionSuccessed)
+                if (Connection)
                 {
                     // успех - закрываем диалог
                     CloseDialog();
                 }
-                AuthErrorText = "Wrong user name or password";
+                AuthErrorText = "Connection falied";
             }, TaskScheduler.FromCurrentSynchronizationContext());
                               
         },
-            (param) =>
-            {
-                if (param == null)
-                    return false;
-
-                var password = (PasswordBox) param;
-                if (string.Equals(string.Empty, password.Password) || string.Equals(string.Empty, Login))
+            () =>
+            {                
+                if (string.Equals(string.Empty, Host) || string.Equals(string.Empty, ApiKey))
                     return false;
                 return true;
             }));
-
-        public event EventHandler<ConnectionStatus> OnStatusChange;
+        
 
         private void CloseDialog()
-        {   
-            // закрывая диалог сообщаем подписчикам о состоянии подключения        
-            OnStatusChange?.Invoke(this, Connection);
+        {               
             Clear();
             CloseDialogAction();
         }
@@ -112,7 +112,6 @@ namespace TaskManager.ViewModel
             {
                 return _closeByCrossCommand ?? (_closeByCrossCommand = new RelayCommand(() =>
                 {
-                    OnStatusChange?.Invoke(this, Connection);
                     Clear();
                 }));
             }

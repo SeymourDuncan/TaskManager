@@ -52,8 +52,7 @@ namespace TaskManager.ViewModel
                         WindowStartupLocation = WindowStartupLocation.CenterOwner
                     };
                     AuthViewModel.Clear();
-                    AuthViewModel.CloseDialogAction = new Action(auth.Close);
-                    AuthViewModel.OnStatusChange += MainViewModel.Dc_OnStatusChange;
+                    AuthViewModel.CloseDialogAction = new Action(auth.Close);                    
                     auth.ShowDialog();
                     break;
                 // модальное окно выбора отслеживаемых задач

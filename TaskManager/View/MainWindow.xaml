@@ -33,7 +33,7 @@
                     <TextBlock Text="{Binding TrackedIssues.Items.Count}"></TextBlock>
                 </StatusBarItem>
             </StatusBar>
-            <Grid Height="41" VerticalAlignment="Top" DockPanel.Dock="Top" Margin="0,0,0.4,0">
+            <Grid VerticalAlignment="Top" DockPanel.Dock="Top" Margin="0,0,0.4,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" MaxWidth="175"/>
                     <ColumnDefinition Width="Auto"/>
@@ -41,17 +41,8 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="228*"/>
                 </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <TextBlock x:Name="textBlock" Margin="6,5,2,0" TextWrapping="Wrap" Text="{Binding UserName}" VerticalAlignment="Top" Height="16" Grid.RowSpan="1"/>
-                <Button Padding="0" x:Name="button" Command="{Binding LoginCommand}" Content="{Binding LoginButtonCaption}" HorizontalAlignment="Left" Margin="6,1,0,0" Width="40" HorizontalContentAlignment="Center" Grid.Row="1" BorderThickness="0" Background="Transparent" Height="17" VerticalAlignment="Top">
-                    <Button.Foreground>
-                        <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.HighlightColorKey}}"/>
-                    </Button.Foreground>
-                </Button>
-                <Button x:Name="button1" Command="{Binding SettingsCommand}" Margin="5.6,0,3.4,0.8" Grid.RowSpan="2" Height="40" Grid.Column="1" BorderThickness="0" Background="Transparent">
+                <TextBlock x:Name="textBlock" Margin="6,5,2,0" TextWrapping="Wrap" Text="{Binding UserName}" Grid.RowSpan="2" VerticalAlignment="Center"/>
+                <Button x:Name="button1" Command="{Binding LoginCommand}" Margin="5.6,0,3.4,0.8" Grid.RowSpan="2" Height="40" Grid.Column="1" BorderThickness="0" Background="Transparent">
                     <Path Stretch="Uniform" Style="{Binding Source={StaticResource SettingIcoStyle}}" />
                 </Button>
                 <Button x:Name="button2" Command="{Binding ShowIssuesSelectWindowCommand}" Margin="5.6,0,3.4,0.8" Grid.RowSpan="2" Height="40" Grid.Column="2" BorderThickness="0" Background="Transparent">
@@ -64,7 +55,8 @@
                     <DataTemplate>
                         <ctrls:IssueUserControl
                             CloseCommand="{Binding Path=DataContext.CloseIssueCommand, RelativeSource={RelativeSource AncestorType={x:Type DockPanel}}}"                            
-                            TrackedIssue="{Binding}"                                                         
+                            TrackedIssue="{Binding}"
+                            ActivityList="{Binding Path=DataContext.TimeEntryActivityList, RelativeSource={RelativeSource AncestorType={x:Type DockPanel}}}"
                             />
                     </DataTemplate>
                 </ListBox.ItemTemplate>

@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using GalaSoft.MvvmLight.Command;
+using Redmine.Net.Api.Types;
 using TaskManager.Model;
 
 namespace TaskManager.Controls
@@ -27,7 +28,7 @@ namespace TaskManager.Controls
         {
             InitializeComponent();
             LayoutRoot.DataContext = this;
-        }
+        }       
 
         public static readonly DependencyProperty CloseCommandProperty =
         DependencyProperty.Register(
@@ -64,6 +65,13 @@ namespace TaskManager.Controls
             set { SetValue(TrackedIssuePropery, value); }
         }
 
+        public static readonly DependencyProperty ActivityListProperty = DependencyProperty.Register("ActivityList", typeof(IList<TimeEntryActivity>), typeof(IssueUserControl), new PropertyMetadata(null));
+        public IList<TimeEntryActivity> ActivityList
+        {
+            get { return (IList<TimeEntryActivity>)GetValue(ActivityListProperty); }
+            set { SetValue(ActivityListProperty, value); }
+        }
+
         private void Expander_Collapsed(object sender, RoutedEventArgs e)
         {
             AdditionalInfo.Visibility = Visibility.Collapsed;
@@ -87,6 +95,11 @@ namespace TaskManager.Controls
         private void CancelCommitBtn_Click(object sender, RoutedEventArgs e)
         {
             CommitField.Visibility = Visibility.Collapsed;
+        }
+
+        private void GoCommitBtn_Click(object sender, RoutedEventArgs e)
+        {
+            
         }
     }
 
@@ -173,10 +186,10 @@ namespace TaskManager.Controls
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             var comment = (string)values[0];
-            var solveIss = (bool) values[1];
+            var active = (TimeEntryActivity) values[1];
             var commitParam = new CommitParameters()
             {
-                Comment = comment, SolveIssue = solveIss
+                Comment = comment, Active = active
             };
             return commitParam;
         }

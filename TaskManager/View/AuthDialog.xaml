@@ -17,11 +17,11 @@
     </i:Interaction.Triggers>    
     <xctk:BusyIndicator IsBusy="{Binding Busy}" BusyContent="Authorization...">
         <Grid Margin="0,0,-0.4,1.6">
-            <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="50,35,0,0" TextWrapping="Wrap" Text="Login" VerticalAlignment="Top"/>
-            <TextBox x:Name="Email" Height="25" Margin="0,56,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding Login}" UndoLimit="40" HorizontalAlignment="Center" Width="193"/>
-            <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="50,86,0,0" TextWrapping="Wrap" Text="Password" VerticalAlignment="Top"/>
-            <PasswordBox x:Name="password" Margin="0,106,0,0" VerticalAlignment="Top" Height="25" SelectionOpacity="40" HorizontalAlignment="Center" Width="194"/>
-            <Button x:Name="Submit" Content="OK" HorizontalAlignment="Left" Margin="54,145,0,0" VerticalAlignment="Top" Width="75" Command="{Binding SubmitRegCommand}" CommandParameter="{Binding ElementName=password}"/>
+            <TextBlock x:Name="hostTb" HorizontalAlignment="Left" Margin="50,35,0,0" TextWrapping="Wrap" Text="Host" VerticalAlignment="Top"/>
+            <TextBox Height="25" Margin="0,56,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding Host, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" Width="193"/>
+            <TextBlock x:Name="apiKeyTb" HorizontalAlignment="Left" Margin="50,86,0,0" TextWrapping="Wrap" Text="API-Key" VerticalAlignment="Top"/>
+            <TextBox Margin="0,106,0,0" Text="{Binding ApiKey, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Height="25" HorizontalAlignment="Center" Width="194"/>
+            <Button x:Name="Submit" Content="OK" HorizontalAlignment="Left" Margin="54,145,0,0" VerticalAlignment="Top" Width="75" Command="{Binding SubmitRegCommand}"/>
             <Button x:Name="Cancel" Content="Cancel" HorizontalAlignment="Left" Margin="169,145,0,0" VerticalAlignment="Top" Width="75" Command="{Binding CloseCommand}"/>
             <TextBlock x:Name="textBlock2" HorizontalAlignment="Left" Margin="50,10,0,0" TextWrapping="Wrap" Text="Use Redmine account" VerticalAlignment="Top" Width="117"/>
             <TextBlock x:Name="textBlock3" HorizontalAlignment="Left" Margin="183,13,0,0" TextWrapping="Wrap" Text="{Binding AuthErrorText}" VerticalAlignment="Top" Width="101" FontSize="9.333" Foreground="#FFE51B1B"/>

@@ -30,27 +30,17 @@ namespace TaskManager.ViewModel
         private string _statusText;
         private bool _mainBusy;
         private string _userName;
-        private bool _isConnected;
         private string _loginButtonCaption = "Login";
         private ICommand _showIssuesSelectWindowCommand;
         
         private TrackedIssueList _trackedIssues;
-        private ICommand _settingsCommand;                
+        private ICommand _settingsCommand;
+        private IList<TimeEntryActivity> _timeEntryActivityList;
 
         #endregion
 
         #region Properties
-
-        // 
-        public bool IsConnected
-        {
-            get { return _isConnected; }
-            set
-            {
-                _isConnected = value;
-                LoginButtonCaption = _isConnected ? "Logout" : "Login";
-            }
-        }
+        
         
         public string Title { get; set; } = "Task Manager";
         public bool MainBusy
@@ -101,6 +91,16 @@ namespace TaskManager.ViewModel
             {
                 _trackedIssues = value;
                 RaisePropertyChanged(() => TrackedIssues);
+            }
+        }
+
+        public IList<TimeEntryActivity> TimeEntryActivityList
+        {
+            get { return _timeEntryActivityList; }
+            set
+            {
+                _timeEntryActivityList = value;
+                RaisePropertyChanged(()=> TimeEntryActivityList);
             }
         }
 
@@ -157,16 +157,11 @@ namespace TaskManager.ViewModel
             })); }
         }
 
-       
-
         #endregion
 
         #region Methods
         private void ShowAuthView()
-        {
-            // чистим пароль
-            Properties.Settings.Default.Password = "";
-            Program.Instance.CurrentUser = "";
+        {                                    
             Messenger.Default.Send(new ShowDialogMessage(DialogWindowTypes.DwAuth));           
         }
 
@@ -176,11 +171,12 @@ namespace TaskManager.ViewModel
             TrackedIssues.SaveToJsonFile();
         }
 
-        public void Dc_OnStatusChange(object sender, ConnectionStatus status)
-        {
-            IsConnected = status == ConnectionStatus.ConnectionSuccessed;
-            StatusText = ConstantsHelper.ConnectionStatusLegend[(int)status];
+        public void Dc_OnStatusChange(object sender, LogMessage status)
+        {            
+            StatusText = status.Head;
             UserName = Program.Instance.CurrentUser;
+            // пробуем поднять активитиз
+            TimeEntryActivityList = Program.Instance.GetTimeEntryActivityList();
         }
 
         public ICommand SettingsCommand
@@ -194,31 +190,33 @@ namespace TaskManager.ViewModel
         }
 
         public void Init()
-        {            
+        {
+            // подписываемся на оповещалку
+           Program.Instance.ShowLogMessage += Dc_OnStatusChange;
+           bool isConnected = false;
             // пробуем сходу законнектиться
            MainBusy = true;
            Task.Factory.StartNew(() =>
            {
-                IsConnected = program.Connect(Properties.Settings.Default.Login, Properties.Settings.Default.Password);
+               isConnected = program.Connect(Properties.Settings.Default.Host, Properties.Settings.Default.Apikey);
             }).ContinueWith((task) =>
             {
-                MainBusy = false;            
-                StatusText = IsConnected
-                    ? ConstantsHelper.ConnectionStatusLegend[(int) ConnectionStatus.ConnectionSuccessed]
-                    : ConstantsHelper.ConnectionStatusLegend[(int) ConnectionStatus.ConnectionFailed];
+                MainBusy = false;                            
 
                 // если не подключились, то вызываем форму
-                if (!IsConnected)
+                if (!isConnected)
                     ShowAuthView();
                 else
                 {
                     UserName = Program.Instance.CurrentUser;
                 }
+                // загружаем справочник действий
+                TimeEntryActivityList = Program.Instance.GetTimeEntryActivityList();
 
-            }, TaskScheduler.FromCurrentSynchronizationContext());
-                     
-            TrackedIssues = new TrackedIssueList();
-            TrackedIssues.LoadFromJsonFile();
+                // загружаем задачи         
+                TrackedIssues = new TrackedIssueList();
+                TrackedIssues.LoadFromJsonFile();
+            }, TaskScheduler.FromCurrentSynchronizationContext());                               
         }
 
 #endregion

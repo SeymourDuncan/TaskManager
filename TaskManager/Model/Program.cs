@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Xml;
 using System.Xml.Serialization;
 using GalaSoft.MvvmLight;
@@ -17,6 +18,13 @@ using Redmine.Net.Api.JSonConverters;
 
 namespace TaskManager.Model
 {
+
+    public struct LogMessage
+    {
+        public string Head;
+        public string Body;
+    }
+
     public class Program
     {
         private static Program _instance;
@@ -24,35 +32,54 @@ namespace TaskManager.Model
         public string CurrentUser { get; set; } = "";
         public int Offset { get; set; } = 0;
         private readonly int issuesLimit = 10;
+        private LogMessage _lastLogMessage;
+
         #region Properties
         public RedmineManager RedmineMng { get; set; }
         #endregion
 
         #region Methods
 
-        public bool Connect(string login, string password)
+        public bool Connect(string host, string apikey)
         {
-            CurrentUser = "";
-            RedmineMng = new RedmineManager(ConstantsHelper.RedmineHost, login, password);
+            CurrentUser = "";            
             // to check auth
             try
             {
+                RedmineMng = new RedmineManager(host, apikey);
                 var user = RedmineMng.GetCurrentUser();
                 CurrentUser = $"{user.LastName} {user.FirstName}";
             }
             catch (Exception e)
             {
+                // если не подключились - грохаем манагера
+                RedmineMng = null;
+                FireShowLogMessage(ConstantsHelper.ConnectionStatusLegend[(int)ConnectionStatus.ConnectionFailed]);
                 return false;
             }
 
             // сохраняем удачное подключение
-            Properties.Settings.Default.Login = login;
-            Properties.Settings.Default.Password = password;
+            Properties.Settings.Default.Host = host;
+            Properties.Settings.Default.Apikey = apikey;
             Properties.Settings.Default.Save();
-
+            FireShowLogMessage(ConstantsHelper.ConnectionStatusLegend[(int) ConnectionStatus.ConnectionSuccessed]);
             return true;
         }
-
+        
+        public IList<TimeEntryActivity> GetTimeEntryActivityList()
+        {            
+            try
+            {
+                var lst = RedmineMng?.GetObjectList<TimeEntryActivity>(new NameValueCollection() {});
+                return lst;
+            }
+            catch (Exception e)
+            {
+                FireShowLogMessage("Error while getting activities list", e.Message);
+                return null;
+            }            
+        }
+         
         public IList<Issue> GetIssuesList()
         {
             try
@@ -64,7 +91,7 @@ namespace TaskManager.Model
                     { "offset", Offset.ToString() },
                     { "limit", issuesLimit.ToString() }
                 };
-                var issues = RedmineMng.GetObjectList<Issue>(parameters);                
+                var issues = RedmineMng?.GetObjectList<Issue>(parameters);                
                 Offset += issuesLimit;               
                 return issues;                
             }
@@ -76,10 +103,9 @@ namespace TaskManager.Model
         #endregion
 
         public void SaveTrackedIssuesToFile(TrackedIssueList issues)
-        {
-            //var path = Path.Combine(Environment.CurrentDirectory, "Data.xml");            
+        {            
             var path = Environment.CurrentDirectory + "\\Data.xml";
-            //var co = new CSomeObjects();
+            
             try
             {
                 XmlSerializer xmlSerializer = new XmlSerializer(typeof(TrackedIssueList));
@@ -111,12 +137,27 @@ namespace TaskManager.Model
                 return new TrackedIssueList();
             }            
         }
+
+        public void FireShowLogMessage(string head, string body = "")
+        {
+            LogMessage lm;
+            lm.Head = head;
+            lm.Body = body;
+            
+            var func = ShowLogMessage;
+            if (func != null)
+            {
+                ShowLogMessage(this, lm);
+            }
+        }
         #region Events
+
+        public event EventHandler<LogMessage> ShowLogMessage;
 
         #endregion
     }
 
-   
+
         
     public class TrackedIssue: ObservableObject
     {
@@ -211,20 +252,19 @@ namespace TaskManager.Model
             TrackedTime = tick + _accumActiveTicks;
         }
 
-        private void CommitIssue(CommitParameters comParams)
+        private bool CommitIssue(CommitParameters comParams)
         {            
             var dt = new DateTime(_trackedTime);
             var zeroDate = new DateTime();
             var qwe = dt - zeroDate;            
             string hours = $"{qwe.TotalHours:0.##}";
-
-            var acts = Program.Instance.RedmineMng.GetObjectList<TimeEntryActivity>(new NameValueCollection() {});
+           
             try
             {
                 var timeEntry = new TimeEntry()
                 {
                     Issue = new IdentifiableName() {Id = IssueItem.Id},
-                    Activity = new IdentifiableName() {Id = 9}, // пока Программирование
+                    Activity = new IdentifiableName() { Id = comParams.Active.Id},
                     Comments = comParams.Comment,
                     CreatedOn = DateTime.Now,
                     CustomFields = null,
@@ -232,10 +272,13 @@ namespace TaskManager.Model
                 };
 
                 Program.Instance.RedmineMng.CreateObject(timeEntry);
+                Program.Instance.FireShowLogMessage("Commit time entry successed");
+                return true;
             }
             catch (Exception e)
             {
-                return;
+                Program.Instance.FireShowLogMessage("Cannot commit time entry", e.Message);                
+                return false;                
             }
             
 
@@ -248,7 +291,10 @@ namespace TaskManager.Model
                 {
                     if (!(obj is CommitParameters))
                         return;
-                    CommitIssue((CommitParameters) obj);
+                    if (CommitIssue((CommitParameters) obj))
+                    {
+                        TrackedTime = 0;
+                    };
                 }));
             }            
         }
@@ -393,6 +439,6 @@ namespace TaskManager.Model
     public class CommitParameters
     {
         public string Comment { get; set; }
-        public bool SolveIssue { get; set; }
+        public TimeEntryActivity Active { get; set; }
     }
 }

@@ -146,6 +146,7 @@ namespace TaskManager.ViewModel
                 return issues;
             }).ContinueWith((task) =>
             {
+                MainBusy = false;
                 var issues = task.Result;
                 if (issues == null)
                     return;            
@@ -157,7 +158,7 @@ namespace TaskManager.ViewModel
                 }
                 // уберем те, которые уже отслеживаются
                 FilterIssuesList();
-                MainBusy = false;
+                
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }       
         
